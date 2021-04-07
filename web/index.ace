@@ -16,7 +16,7 @@ html lang=en
         {{ range . }}
         div.row.rcorners
           div.vertical-center
-            {{ .Name }} {{.Status}} {{.ID}} 
+            {{ .Name }}
             form action="/delete" method="POST" 
               input type="hidden" value="{{ .ID }}" name="name"
               input type="submit" value="Delete"

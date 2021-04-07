@@ -1,8 +1,8 @@
 package main
 
 import (
-	"To-Do-List/routers"
-	"To-Do-List/template"
+	"github.com/mikekbnv/To-Do-List/internal/routers"
+	"github.com/mikekbnv/To-Do-List/internal/template"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
