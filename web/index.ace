@@ -30,7 +30,7 @@ html lang=en
             div.col-sm-1
               label.font-weight-bold.col-form-label Task
             div.col-sm-9
-              input.col-sm-12.form-control type="text" name="name"
+              input.col-sm-12.form-control type="text" name="name" placeholder="Enter your task..."
             div.col-sm-2
               input.col-sm-12.btn.btn-primary type="submit" value="Add"  
       
