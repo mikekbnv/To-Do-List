@@ -5,23 +5,50 @@ html lang=en
     link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"
     link rel="stylesheet" href="styles.css"
     title Go To-Do-List 
-  body.content
-    p To-Do-List for user: {{ .User }} 
-    form action="/" method="POST"
-      input type="text" name="name"
-      input type="submit" value="Add"  
-    
-    div.container 
-      {{ with .List }}
-        {{ range . }}
-        div.row.rcorners
-          div.vertical-center
-            {{ .Name }}
-            form action="/delete" method="POST" 
-              input type="hidden" value="{{ .ID }}" name="name"
-              input type="submit" value="Delete"
-        {{ end }} 
-      {{ end }}
+  body
+    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+      a.navbar-brand href=# {{ .User}}s' list
+      button.navbar-toggler
+        span.navbar-toggler-icon
+      #navbarNav.collapse.navbar-collapse
+        ul.navbar-nav
+          li.nav-item.active
+            a.nav-link href=# 
+              Home
+              span.sr-only (current)
+          li.nav-item
+            a.nav-link href=# Features
+          li.nav-item
+            a.nav-link href=# Pricing
+          li.nav-item
+            a.nav-link href=# Disabled  
+
+    div.container.mt-5
+      div
+        form action="/" method="POST"
+          div.form-group.row
+            div.col-sm-1
+              label.font-weight-bold.col-form-label Task
+            div.col-sm-9
+              input.col-sm-12.form-control type="text" name="name"
+            div.col-sm-2
+              input.col-sm-12.btn.btn-primary type="submit" value="Add"  
+      
+      div 
+        ul.list-group {{ with .List }}
+          {{ range . }}
+          li.list-group-item
+            div.row
+              div.col-sm-10
+                div.center
+                  {{ .Name }}
+              div.col-sm-2
+                form action="/delete" method="POST"
+                  input type="hidden" value="{{ .ID }}" name="name"
+                  input.col-sm-4.mx-3.btn-sm.btn.btn-success type="submit" value="✓"
+                  input.col-sm-4.ml-2.btn-sm.btn.btn-danger type="submit" value="✕"
+          {{ end }} 
+        {{ end }}
     
 
 
