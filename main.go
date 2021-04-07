@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/mikekbnv/To-Do-List/internal/routers"
 	"github.com/mikekbnv/To-Do-List/internal/template"
 
@@ -9,6 +11,10 @@ import (
 )
 
 func main() {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8000"
+	}
 	e := echo.New()
 
 	e.Use(
@@ -24,5 +30,5 @@ func main() {
 	e.Static("/", "web")
 	routers.Register(e)
 
-	e.Logger.Fatal(e.Start(":8000"))
+	e.Logger.Fatal(e.Start(":" + port))
 }
