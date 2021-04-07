@@ -1,0 +1,41 @@
+= doctype html
+html lang=en
+  head
+    meta charset=utf-8
+    script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+    link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css"
+    script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"
+    link rel="stylesheet" href="styles.css"
+    title Go To-Do-List 
+  body
+  div.ui.three.column.centered.grid.middle.aligned.center.aligned.grid
+    div.column
+      div.ui.middle.aligned.center.aligned.grid
+        div.column
+          h2.ui.teal.image.header
+            div.content Create your account
+          form.ui.large.form
+            div.ui.stacked.segment
+              div.field
+                div.ui.left.icon.input
+                  i.user.icon
+                  input name="Name" placeholder="Name" type="text"
+              div.field
+                div.ui.left.icon.input
+                  i.address.book.icon
+                  input name="LastName" placeholder="Last Name" type="text"
+              div.field
+                div.ui.left.icon.input
+                  i.at.icon
+                  input name="email" placeholder="E-mail address" type="text"
+              div.field
+                div.ui.left.icon.input
+                  i.hand.point.right.outline.icon
+                  input name="nick" placeholder="Nickname" type="text"
+              div.field
+                div.ui.left.icon.input
+                  i.lock.icon
+                  input name="password" placeholder="Password" type="password"
+              div.ui.fluid.large.teal.submit.button Sign Up
+            div.ui.error.message
+   

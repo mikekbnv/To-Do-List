@@ -30,7 +30,7 @@ html lang=en
             div.col-sm-1
               label.font-weight-bold.col-form-label Task
             div.col-sm-9
-              input.col-sm-12.form-control type="text" name="name" placeholder="Enter your task..."
+              input.col-sm-12.form-control type="text" name="task" placeholder="Enter your task..."
             div.col-sm-2
               input.col-sm-12.btn.btn-primary type="submit" value="Add"  
       
@@ -44,7 +44,7 @@ html lang=en
                   {{ .Name }}
               div.col-sm-2
                 form action="/delete" method="POST"
-                  input type="hidden" value="{{ .ID }}" name="name"
+                  input type="hidden" value="{{ .ID }}" name="id"
                   input.col-sm-4.mx-3.btn-sm.btn.btn-success type="submit" value="✓"
                   input.col-sm-4.ml-2.btn-sm.btn.btn-danger type="submit" value="✕"
           {{ end }} 
