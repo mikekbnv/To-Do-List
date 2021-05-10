@@ -14,7 +14,7 @@ html lang=en
         div.column
           h2.ui.teal.image.header
             div.content Log-in to your account
-          form.ui.large.form
+          form.ui.large.form action="/login" method="POST"
             div.ui.stacked.segment
               div.field
                 div.ui.left.icon.input
@@ -24,7 +24,7 @@ html lang=en
                 div.ui.left.icon.input
                   i.lock.icon
                   input name="password" placeholder="Password" type="password"
-              div.ui.fluid.large.teal.submit.button Login
+              div.ui.fluid.large.teal.submit.button type="submit" Login
             div.ui.error.message
           div.ui.message New to us? 
             a href="#"  Sign Up

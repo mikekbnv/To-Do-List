@@ -8,39 +8,27 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mikekbnv/To-Do-List/database"
 	"github.com/mikekbnv/To-Do-List/internal/model"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/mgo.v2/bson"
 )
 
-var Collections *mongo.Collection
-var ctx context.Context
+var userCollection *mongo.Collection = database.OpenCollection(database.Client, "users")
 
-func init() {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb+srv://admin:admin@cluster0.0alta.mongodb.net/tasks?retryWrites=true&w=majority"))
-	if err != nil {
-		fmt.Println(err)
-	}
-	ctx, cencel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cencel()
-	err = client.Connect(ctx)
-	if err != nil {
-		fmt.Println(err)
-	}
-	Collections = client.Database("tasks").Collection("list")
-}
 func Register(e *echo.Echo) {
 	e.Add("GET", "/", alltasks, middleware.Logger())
 	e.Add("POST", "/", createtask, middleware.Logger())
 	e.Add("POST", "/delete", deletetask, middleware.Logger())
 
 	e.Add("GET", "/login", login, middleware.Logger())
-	e.Add("GET", "/signup", signup, middleware.Logger())
+	//e.Add("POST", "/login", getdata, middleware.Logger())
+
+	//e.Add("GET", "/signup", signup, middleware.Logger())
 }
 
 func alltasks(c echo.Context) error {
@@ -55,7 +43,11 @@ func alltasks(c echo.Context) error {
 }
 func getAll() ([]*model.Task, error) {
 	var tasks []*model.Task
-	cur, err := Collections.Find(context.Background(), bson.M{})
+
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+	defer cancel()
+
+	cur, err := userCollection.Find(context.Background(), bson.M{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -88,7 +80,7 @@ func createtask(c echo.Context) error {
 }
 
 func addtodb(task string) error {
-	_, err := Collections.InsertOne(context.Background(), model.Task{ID: primitive.NewObjectID(), Name: task})
+	_, err := userCollection.InsertOne(context.Background(), model.Task{ID: primitive.NewObjectID(), Name: task})
 	if err != nil {
 		log.Fatal("InsertOne() ERROR:", err)
 	}
@@ -97,7 +89,7 @@ func addtodb(task string) error {
 
 func deletetask(c echo.Context) error {
 	id := getid(c.Request().PostFormValue("id"))
-	_, err := Collections.DeleteOne(context.Background(), bson.M{"_id": id})
+	_, err := userCollection.DeleteOne(context.Background(), bson.M{"_id": id})
 	if err != nil {
 		log.Fatal("DeleteOne() ERROR:", err)
 	}
@@ -115,9 +107,15 @@ func getid(object string) primitive.ObjectID {
 }
 
 func login(c echo.Context) error {
-	return c.Render(http.StatusOK, "login", map[string]interface{}{})
+	return c.Render(http.StatusOK, "login1", map[string]interface{}{})
 }
 
-func signup(c echo.Context) error {
-	return c.Render(http.StatusOK, "signup", map[string]interface{}{})
-}
+// func signup(c echo.Context) error {
+// 	return c.Render(http.StatusOK, "signup", map[string]interface{}{})
+//}
+
+// func getdata(c echo.Context) error {
+// 	name := c.Request().PostFormValue("name")
+ 	// pass := c.Request().PostFormValue("pass")
+// 	return c.Redirect(http.StatusFound, "/")
+//}
