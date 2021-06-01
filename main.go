@@ -3,11 +3,11 @@ package main
 import (
 	"os"
 
-	"github.com/mikekbnv/To-Do-List/internal/routers"
-	"github.com/mikekbnv/To-Do-List/internal/template"
-
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+	"github.com/mikekbnv/To-Do-List/config"
+	"github.com/mikekbnv/To-Do-List/internal/routing"
+	"github.com/mikekbnv/To-Do-List/internal/template"
 )
 
 func main() {
@@ -16,10 +16,9 @@ func main() {
 		port = "8000"
 	}
 	e := echo.New()
-
 	e.Use(
 		middleware.Logger(),
-		middleware.Recover(),
+		//middle.CkeckRoute(),
 	)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
@@ -28,7 +27,7 @@ func main() {
 
 	e.Renderer = template.NewEngine("web")
 	e.Static("/", "web")
-	routers.Register(e)
+	routing.Register(e, config.Routes, "")
 
 	e.Logger.Fatal(e.Start(":" + port))
 }
