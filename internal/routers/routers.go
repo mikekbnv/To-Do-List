@@ -272,7 +272,7 @@ func clearcookie(c echo.Context) echo.Context { //Method for clearing user cooki
 	return c
 }
 
-func getid(object string) primitive.ObjectID { //Method for parcing mongoDB primitive.ObjectI to string id
+func getid(object string) primitive.ObjectID { //Method for parcing mongoDB primitive.ObjectI to string ID
 	start := strings.Index(object, "\"")
 	id := object[start+1 : len(object)-2]
 	idPrimitive, err := primitive.ObjectIDFromHex(id)
