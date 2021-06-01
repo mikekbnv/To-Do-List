@@ -3,15 +3,15 @@ html lang=en
   head
     meta charset=utf-8
     link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"
-    link rel="stylesheet" href="styles.css"
+    link rel="stylesheet" href="css/styles.css"
     title Go To-Do-List 
-  body
-    nav.navbar.navbar-expand-lg.navbar-light.bg-light
+  body     
+    nav.navbar.navbar-expand-lg.navbar-light style="background-color: #a5cfec;"
       a.navbar-brand href=# {{ .User}}s' list
       button.navbar-toggler
         span.navbar-toggler-icon
       #navbarNav.collapse.navbar-collapse
-        ul.navbar-nav
+        ul.navbar-nav.mr-auto
           li.nav-item.active
             a.nav-link href=# 
               Home
@@ -22,19 +22,26 @@ html lang=en
             a.nav-link href=# Pricing
           li.nav-item
             a.nav-link href=# Disabled  
-
-    div.container.mt-5
+        ul.navbar-nav
+          li.nav-item
+            form action="/logout" method="POST"
+              input.btn.btn-primary.my-2.my-sm-0 type="submit" value="LOGOUT"
+    div.container.mt-5 
+      div.row
+        div.col-11
+          form action="/list" method="POST"
+            div.form-group.row
+              div.col-sm-1
+                label.font-weight-bold.col-form-label Task
+              div.col-sm-10
+                input.col.form-control type="text" name="task" placeholder="Enter your task..."
+              div.col-sm-1
+                input.col.btn.btn-primary type="submit" value="Add"  
+        div.col-1
+          form action="/list" method="GET"  
+            input.col-sm-12.btn.btn-primary type="submit" value="Clear"      
+          
       div
-        form action="/" method="POST"
-          div.form-group.row
-            div.col-sm-1
-              label.font-weight-bold.col-form-label Task
-            div.col-sm-9
-              input.col-sm-12.form-control type="text" name="task" placeholder="Enter your task..."
-            div.col-sm-2
-              input.col-sm-12.btn.btn-primary type="submit" value="Add"  
-      
-      div 
         ul.list-group {{ with .List }}
           {{ range . }}
           li.list-group-item
