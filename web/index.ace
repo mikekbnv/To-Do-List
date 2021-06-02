@@ -7,21 +7,19 @@ html lang=en
     title Go To-Do-List 
   body     
     nav.navbar.navbar-expand-lg.navbar-light style="background-color: #a5cfec;"
-      a.navbar-brand href=# {{ .User}}s' list
+      a.navbar-brand href="/list" {{ .User}}s' list
       button.navbar-toggler
         span.navbar-toggler-icon
       #navbarNav.collapse.navbar-collapse
         ul.navbar-nav.mr-auto
           li.nav-item.active
-            a.nav-link href=# 
-              Home
-              span.sr-only (current)
+            a.nav-link href=# Home
           li.nav-item
-            a.nav-link href=# Features
+            a.nav-link href=# Test
           li.nav-item
             a.nav-link href=# Pricing
-          li.nav-item
-            a.nav-link href=# Disabled  
+          li.nav-item.active
+            a.nav-link href="/alltasks" All tasks(Completed, deleted)
         ul.navbar-nav
           li.nav-item
             form action="/logout" method="POST"
