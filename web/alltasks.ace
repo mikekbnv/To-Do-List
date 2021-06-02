@@ -1,0 +1,36 @@
+= doctype html
+html lang=en
+  head
+    meta charset=utf-8
+    link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"
+    link rel="stylesheet" href="css/styles.css"
+    title Go To-Do-List 
+  body     
+    nav.navbar.navbar-expand-lg.navbar-light style="background-color: #a5cfec;"
+      a.navbar-brand href="/list" {{ .User}}s' list
+      button.navbar-toggler
+        span.navbar-toggler-icon
+      #navbarNav.collapse.navbar-collapse
+        ul.navbar-nav.mr-auto
+        ul.navbar-nav
+          li.nav-item
+            form action="/logout" method="POST"
+              input.btn.btn-primary.my-2.my-sm-0 type="submit" value="LOGOUT"
+    div.container.mt-5     
+      div
+        ul.list-group {{ with .List }}
+          {{ range . }}
+          li.list-group-item
+            div.row.align-items-center
+              div.col-sm-10
+                {{ .Name }}
+              div.col-sm-2
+                form action="/undo" method="POST"
+                  input type="hidden" value="{{ .ID }}" name="id"
+                  input.col-sm-6.offset-6.btn.btn-warning type="submit" value="Undo"
+          {{ end }} 
+        {{ end }}
+    
+
+
+  
