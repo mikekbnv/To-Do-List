@@ -14,6 +14,7 @@ import (
 	"github.com/mikekbnv/To-Do-List/internal/model"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -33,7 +34,7 @@ func Get_List(c echo.Context) error {
 	clientname := c.Get("first_name")
 	id := c.Get("uid")
 	id_str := fmt.Sprint(id)
-	list, err := get_All_Tasks(id_str)
+	list, err := get_All_Tasks(id_str, "valid")
 	if err != nil {
 		log.Println("error with getting tasks")
 	}
@@ -42,7 +43,7 @@ func Get_List(c echo.Context) error {
 		"List": list,
 	})
 }
-func get_All_Tasks(user_id interface{}) ([]*model.Task, error) { //Helper for getting tasks
+func get_All_Tasks(user_id interface{}, key string) ([]*model.Task, error) { //Helper for getting tasks
 	var tasks []*model.Task
 
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
@@ -58,7 +59,11 @@ func get_All_Tasks(user_id interface{}) ([]*model.Task, error) { //Helper for ge
 		if err != nil {
 			return tasks, err
 		}
-		tasks = append(tasks, &t)
+		if key == "all" && t.Status {
+			tasks = append(tasks, &t)
+		} else if key == "valid" && !t.Status {
+			tasks = append([]*model.Task{&t}, tasks...)
+		}
 	}
 
 	if err := cur.Err(); err != nil {
@@ -73,6 +78,46 @@ func get_All_Tasks(user_id interface{}) ([]*model.Task, error) { //Helper for ge
 }
 
 //Ending for getting tasks
+
+//getting tasks for the whole period
+func All_tasks(c echo.Context) error {
+	clientname := c.Get("first_name")
+	id := c.Get("uid")
+	id_str := fmt.Sprint(id)
+	list, err := get_All_Tasks(id_str, "all")
+	if err != nil {
+		log.Println("error with getting tasks")
+	}
+	return c.Render(http.StatusOK, "alltasks", map[string]interface{}{
+		"User": clientname,
+		"List": list,
+	})
+}
+
+//Undo task if it was deleted
+func Undo_task(c echo.Context) error {
+	ID := getid(c.Request().FormValue("id"))
+	//log.Println("TASK ID:", ID)
+
+	upsert := true
+	opt := options.UpdateOptions{
+		Upsert: &upsert,
+	}
+	update := bson.M{
+		"$set": bson.M{"status": false},
+	}
+	_, err := tasksCollection.UpdateOne(
+		context.Background(),
+		bson.M{"_id": ID},
+		update,
+		&opt,
+	)
+	if err != nil {
+		log.Fatal("Undo error:", err)
+	}
+
+	return c.Redirect(http.StatusFound, "/alltasks")
+}
 
 //Adding and creating task to Database
 func Createtask(c echo.Context) error {
@@ -99,8 +144,20 @@ func add_To_Db(task, id string) { //Helper func for adding to Database
 func Deletetask(c echo.Context) error {
 	ID := getid(c.Request().FormValue("id"))
 	//log.Println("TASK ID:", ID)
-	_, err := tasksCollection.DeleteOne(context.Background(), bson.M{"_id": ID})
-	//log.Println("\nDELETE INFO:", info.DeletedCount)
+
+	upsert := true
+	opt := options.UpdateOptions{
+		Upsert: &upsert,
+	}
+	update := bson.M{
+		"$set": bson.M{"status": true},
+	}
+	_, err := tasksCollection.UpdateOne(
+		context.Background(),
+		bson.M{"_id": ID},
+		update,
+		&opt,
+	)
 	if err != nil {
 		log.Fatal("DeleteOne() ERROR:", err)
 	}
@@ -156,7 +213,10 @@ func Signup(c echo.Context) error { //Post method
 	token, refreshToken, _ := helper.GenerateAllTokens()
 	user.Token = &token
 	user.Refresh_token = &refreshToken
-
+	if len(msg.Errors) != 0 {
+		//log.Println(msg)
+		c.Render(http.StatusBadRequest, "signup", msg)
+	}
 	_, insertErr := usersCollection.InsertOne(ctx, model.User{
 		ID:            user.ID,
 		First_name:    user.First_name,
@@ -174,10 +234,6 @@ func Signup(c echo.Context) error { //Post method
 		return c.JSON(http.StatusNotImplemented, map[string]interface{}{"error": msg})
 	}
 	defer cancel()
-	if len(msg.Errors) != 0 {
-		//log.Println(msg)
-		c.Render(http.StatusBadRequest, "signup", msg)
-	}
 	return c.Redirect(http.StatusFound, "/login")
 }
 
@@ -243,7 +299,6 @@ func Logout(c echo.Context) error { //Post for logout
 	c = clearcookie(c)
 	return c.Redirect(http.StatusFound, "/login")
 }
-
 func HashPassword(password string) string {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
