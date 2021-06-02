@@ -58,4 +58,20 @@ var Routes = []routing.Route{
 			custom_middleware.Authentication(),
 		},
 	},
+	{
+		Method:  "GET",
+		Path:    "/alltasks",
+		Handler: routers.All_tasks,
+		Middleware: []echo.MiddlewareFunc{
+			custom_middleware.Authentication(),
+		},
+	},
+	{
+		Method:  "POST",
+		Path:    "/undo",
+		Handler: routers.Undo_task,
+		Middleware: []echo.MiddlewareFunc{
+			custom_middleware.Authentication(),
+		},
+	},
 }
