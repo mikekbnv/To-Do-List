@@ -4,6 +4,9 @@ html lang=en
     meta charset=utf-8
     link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"
     link rel="stylesheet" href="css/styles.css"
+    script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+    script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"
+    script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
     title Go To-Do-List 
   body     
     nav.navbar.navbar-expand-lg.navbar-light style="background-color: #a5cfec;"
@@ -44,16 +47,34 @@ html lang=en
           {{ range . }}
           li.list-group-item
             div.row
-              div.col-sm-10
+              div.col-sm-9
                 div.center
                   {{ .Name }}
               div.col-sm-2
+                
                 form action="/delete" method="POST"
-                  input type="hidden" value="{{ .ID }}" name="id"
-                  input.col-sm-4.mx-3.btn-sm.btn.btn-success type="submit" value="✓"
-                  input.col-sm-4.ml-2.btn-sm.btn.btn-danger type="submit" value="✕"
-          {{ end }} 
-        {{ end }}
+                  input type="hidden" value="{{ .ID }}" name="task_id"
+                  input.col-sm-5.btn-sm.btn.btn-success type="submit" value="✓"
+                  input.col-sm-5.ofset-1.ml-4.btn-sm.btn.btn-danger type="submit" value="✕"
+              div.col-sm-1
+                button.col-sm-12.btn.btn-warning.btn-sm type="button" data-toggle="modal" data-target="#M{{ .Modal_Id }}"
+                  Open edit
+                div.modal id="M{{ .Modal_Id }}"
+                  div.modal-dialog
+                    div.modal-content
+                      div.modal-header
+                        h4.modal-title Task 
+                        button.close type="button" data-dismiss="modal" &times 
+                      
+                        div.modal-body
+                          form role="form" action="/edit" method="POST"
+                            input type="hidden" value="{{ .ID }}" name="task_id"
+                            input.col.form-control type="text" name="task" value="{{ .Name }}" placeholder="{{ .Name }}"
+                            input type="submit" value="Edit"
+                        div.modal-footer
+                         
+            {{ end }} 
+          {{ end }}
     
 
 
