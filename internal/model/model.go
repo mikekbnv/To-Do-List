@@ -20,8 +20,9 @@ type User struct {
 	User_id       string             `json:"user_id"`
 }
 type Task struct {
-	ID      primitive.ObjectID `bson:"_id,omitempty"`
-	User_Id string             `json:"user_id"`
-	Name    string             `json:"name"`
-	Status  bool               `json:"status"`
+	ID       primitive.ObjectID `bson:"_id,omitempty"`
+	User_Id  string             `json:"user_id"`
+	Name     string             `json:"name"`
+	Modal_Id string             `json:"modal_id"`
+	Status   bool               `json:"status"`
 }
