@@ -17,7 +17,9 @@ func main() {
 	}
 	e := echo.New()
 	e.Use(
-		middleware.Logger(),
+		middleware.LoggerWithConfig(middleware.LoggerConfig{
+			Format: "method=${method}, uri=${uri}, status=${status}\n",
+		}),
 		//middle.CkeckRoute(),
 	)
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
