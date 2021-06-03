@@ -74,4 +74,12 @@ var Routes = []routing.Route{
 			custom_middleware.Authentication(),
 		},
 	},
+	{
+		Method:  "POST",
+		Path:    "/edit",
+		Handler: routers.Edit_task,
+		Middleware: []echo.MiddlewareFunc{
+			custom_middleware.Authentication(),
+		},
+	},
 }
