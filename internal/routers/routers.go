@@ -132,7 +132,10 @@ func Createtask(c echo.Context) error {
 }
 
 func add_To_Db(task, id string) { //Helper func for adding to Database
-	_, err := tasksCollection.InsertOne(context.Background(), model.Task{ID: primitive.NewObjectID(), Name: task, User_Id: id})
+	Id := primitive.NewObjectID()
+	start := strings.Index(Id.String(), "\"")
+	str_id := Id.String()[start+1 : len(Id.String())-2]
+	_, err := tasksCollection.InsertOne(context.Background(), model.Task{ID: Id, Name: task, User_Id: id, Modal_Id: str_id})
 	if err != nil {
 		log.Fatal("InsertOne() ERROR:", err)
 	}
@@ -142,24 +145,23 @@ func add_To_Db(task, id string) { //Helper func for adding to Database
 
 //Deleting task from Database
 func Deletetask(c echo.Context) error {
-	ID := getid(c.Request().FormValue("id"))
-	//log.Println("TASK ID:", ID)
 
-	upsert := true
-	opt := options.UpdateOptions{
-		Upsert: &upsert,
-	}
-	update := bson.M{
-		"$set": bson.M{"status": true},
-	}
-	_, err := tasksCollection.UpdateOne(
-		context.Background(),
-		bson.M{"_id": ID},
-		update,
-		&opt,
-	)
+	ID := getid(c.Request().FormValue("task_id"))
+	//log.Println("TASK ID:", ID)
+	err := update_by_id(ID, "status", true)
 	if err != nil {
-		log.Fatal("DeleteOne() ERROR:", err)
+		log.Fatal("Update status() ERROR:", err)
+	}
+	return c.Redirect(http.StatusFound, "/list")
+}
+
+//Edit task
+func Edit_task(c echo.Context) error {
+	ID := getid(c.Request().FormValue("task_id"))
+	task := c.Request().PostFormValue("task")
+	err := update_by_id(ID, "name", task)
+	if err != nil {
+		log.Fatal("Edit task() ERROR:", err)
 	}
 	return c.Redirect(http.StatusFound, "/list")
 }
@@ -335,6 +337,33 @@ func getid(object string) primitive.ObjectID { //Method for parcing mongoDB prim
 		log.Fatal("primitive.ObjectIDFromHex ERROR:", err)
 	}
 	return idPrimitive
+}
+func update_by_id(id primitive.ObjectID, field string, value interface{}) error { //Update Task in DB by the provided field and value
+	update := bson.M{}
+	if field == "name" {
+		update = bson.M{
+			"$set": bson.M{field: value.(string)},
+		}
+	} else if field == "status" {
+		update = bson.M{
+			"$set": bson.M{field: value.(bool)},
+		}
+	}
+	upsert := true
+	opt := options.UpdateOptions{
+		Upsert: &upsert,
+	}
+	log.Println("ID ", id, "\nTask ", value)
+	_, err := tasksCollection.UpdateOne(
+		context.Background(),
+		bson.M{"_id": id},
+		update,
+		&opt,
+	)
+	if err != nil {
+		log.Fatal("UPDATE() ERROR:", err)
+	}
+	return err
 }
 
 func errors(msg map[string]string, field, msg_error string) map[string]string { //Method for helping to collect error from login or signup handlerss
