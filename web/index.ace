@@ -59,20 +59,19 @@ html lang=en
               div.col-sm-1
                 button.col-sm-12.btn.btn-warning.btn-sm type="button" data-toggle="modal" data-target="#M{{ .Modal_Id }}"
                   Open edit
-                div.modal id="M{{ .Modal_Id }}"
-                  div.modal-dialog
+                div.modal.fade id="M{{ .Modal_Id }}" tabindex="-1" role="dialog"
+                  div.modal-dialog.modal-dialog-centered role="document"
                     div.modal-content
                       div.modal-header
-                        h4.modal-title Task 
-                        button.close type="button" data-dismiss="modal" &times 
-                      
-                        div.modal-body
-                          form role="form" action="/edit" method="POST"
-                            input type="hidden" value="{{ .ID }}" name="task_id"
-                            input.col.form-control type="text" name="task" value="{{ .Name }}" placeholder="{{ .Name }}"
-                            input type="submit" value="Edit"
-                        div.modal-footer
-                         
+                        h5.modal-title id="exampleModalLongTitle" Task
+                        button.close type="button" data-dismiss="modal" aria-label="Close"
+                          span aria-hidden="true" ×
+                      div.modal-body
+                        form role="form" action="/edit" method="POST"
+                          input type="hidden" value="{{ .ID }}" name="task_id"
+                          input.col.form-control type="text" name="task" value="{{ .Name }}" placeholder="{{ .Name }}"
+                          div.mt-2 style="display: flex; justify-content: flex-end"
+                            input.btn.btn-success type="submit" value="Save"          
             {{ end }} 
           {{ end }}
     
