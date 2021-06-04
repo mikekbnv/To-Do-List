@@ -353,7 +353,7 @@ func update_by_id(id primitive.ObjectID, field string, value interface{}) error 
 	opt := options.UpdateOptions{
 		Upsert: &upsert,
 	}
-	log.Println("ID ", id, "\nTask ", value)
+	//log.Println("ID ", id, "\nTask ", value)
 	_, err := tasksCollection.UpdateOne(
 		context.Background(),
 		bson.M{"_id": id},
