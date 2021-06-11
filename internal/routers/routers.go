@@ -20,7 +20,8 @@ import (
 )
 
 type Message struct {
-	Errors map[string]string
+	Inputed_info map[string]string
+	Errors       map[string]string
 }
 
 const Token_Cookie_Name = "token"
@@ -176,6 +177,7 @@ func Signup(c echo.Context) error { //Post method
 	var user model.User
 	var msg Message
 	msg.Errors = make(map[string]string)
+	msg.Inputed_info = make(map[string]string)
 
 	defer cancel()
 
@@ -184,12 +186,18 @@ func Signup(c echo.Context) error { //Post method
 	}
 	if *user.First_name == "" {
 		msg.Errors = errors(msg.Errors, "First_name", "First name cannot be empty")
+	} else {
+		msg.Inputed_info["First_Name"] = *user.First_name
 	}
 	if *user.Last_name == "" {
 		msg.Errors = errors(msg.Errors, "Last_name", "Last name cannot be empty")
+	} else {
+		msg.Inputed_info["Last_Name"] = *user.Last_name
 	}
-	if *user.Email == "" {
-		msg.Errors = errors(msg.Errors, "Email", "Email cannot be empty")
+	if !helper.IsEmailValid(*user.Email) {
+		msg.Errors = errors(msg.Errors, "Email", "Email is not valid")
+	} else {
+		msg.Inputed_info["Email"] = *user.Email
 	}
 	confirmation_pass := c.Request().FormValue("confirmation-password")
 	if *user.Password == "" && confirmation_pass == "" {
@@ -202,9 +210,13 @@ func Signup(c echo.Context) error { //Post method
 	}
 	if count > 0 {
 		msg.Errors = errors(msg.Errors, "Email", "User with this email alredy exist")
+		msg.Inputed_info["Email"] = ""
 	}
 	if confirmation_pass != *user.Password {
 		msg.Errors = errors(msg.Errors, "Password", "Passwords did not match")
+	}
+	if len(msg.Errors) != 0 {
+		return c.Render(http.StatusOK, "signup", msg)
 	}
 	password := HashPassword(*user.Password)
 	user.Password = &password
@@ -215,10 +227,7 @@ func Signup(c echo.Context) error { //Post method
 	token, refreshToken, _ := helper.GenerateAllTokens()
 	user.Token = &token
 	user.Refresh_token = &refreshToken
-	if len(msg.Errors) != 0 {
-		//log.Println(msg)
-		c.Render(http.StatusBadRequest, "signup", msg)
-	}
+
 	_, insertErr := usersCollection.InsertOne(ctx, model.User{
 		ID:            user.ID,
 		First_name:    user.First_name,
