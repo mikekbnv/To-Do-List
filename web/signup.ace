@@ -25,7 +25,7 @@ html lang=en
                       div.inline
                     {{end}}
                     div.form-group
-                      input.form-control.input-sm type="text" name="first_name" placeholder="First Name"
+                      input.form-control.input-sm type="text" name="first_name" value="{{ .Inputed_info.First_Name}}" placeholder="First Name"
                   div.col-xs-6.col-sm-6.col-md-6
                     {{if .Errors.Last_name}}
                       {{with .Errors.Last_name }}
@@ -35,13 +35,13 @@ html lang=en
                       div.inline
                     {{end}}
                     div.form-group
-                      input.form-control.input-sm type="text" name="last_name" placeholder="Last Name"
+                      input.form-control.input-sm type="text" name="last_name" value="{{ .Inputed_info.Last_Name}}" placeholder="Last Name"
 
                 div.form-group
                   {{with .Errors.Email }}
                   p {{ . }}
                   {{ end }}
-                  input.form-control.input-sm type="email" name="email" placeholder="Email Address"
+                  input.form-control.input-sm type="email" name="email" value="{{ .Inputed_info.Email }}" placeholder="Email Address"
                 {{with .Errors.Password }}
                 p {{ . }}
                 {{ end }}
