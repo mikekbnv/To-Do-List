@@ -1,0 +1,50 @@
+= doctype html
+html lang=en
+  head
+    meta charset=utf-8
+    link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"
+    link rel="stylesheet" href="css/acc.css"
+    script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+    script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"
+    script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+    title Go To-Do-List 
+  body     
+    div.wrapper.bg-white.mt-sm-5
+      div.row.border-bottom
+        div.col-6
+          h4.pb-4 Account settings
+        div.col-6
+          form action="/list" method="GET"
+            button.btn.border.button.float-right Back to list
+      div.d-flex.align-items-start.py-3.border-bottom
+        img.img src="https://images.pexels.com/photos/1037995/pexels-photo-1037995.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt=""
+        div.pl-sm-4.pl-2 id="img-section" 
+          b Profile Photo
+          p Accepted file type png   
+          button.btn.button.border 
+            b Upload
+      div.py-2
+        div.row.py-2
+          div.col-md-6 
+            label for="firstname" First Name
+              input.bg-light.form-control type="text" value="{{ .First_name }}" placeholder="{{ .First_name }}"
+          div.col-md-6.pt-md-0.pt-3
+            label for="lastname" Last Name 
+              input.bg-light.form-control type="text" value="{{ .Last_name }}" placeholder="{{ .Last_name }}" 
+        div.row.py-2
+          div.col-md-6
+            label for="email" Email Address 
+              input.bg-light.form-control type="text" value="{{ .Email }}" placeholder="{{ .Email }}"
+          div.col-md-6.pt-md-0.pt-3
+            label for="phone" Phone Number
+              input.bg-light.form-control type="tel" placeholder="+1 213-548-6015"
+        div.row.py-3.pb-4.border-bottom 
+          div.col-3
+            form action="/list" method="GET"
+              button.btn.btn-primary Change
+          div.col-3
+            form action="/list" method="GET"
+              button.btn.border.button Cancel
+
+
+  
