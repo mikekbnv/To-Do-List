@@ -24,9 +24,13 @@ html lang=en
           li.nav-item.active
             a.nav-link href="/alltasks" All tasks(Completed, deleted)
         ul.navbar-nav
-          li.nav-item
+          li.nav-item.mr-3
             form action="/logout" method="POST"
               input.btn.btn-primary.my-2.my-sm-0 type="submit" value="LOGOUT"
+          li.nav-item
+            form role="form" action="/account" method="POST"
+              input.btn.btn-success.my-2.my-sm-0 type="submit" value="Account"
+
     div.container.mt-5 
       div.row
         div.col-11
