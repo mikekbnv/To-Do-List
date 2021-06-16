@@ -166,6 +166,24 @@ func Edit_task(c echo.Context) error {
 	}
 	return c.Redirect(http.StatusFound, "/list")
 }
+//
+func Account_info_page(c echo.Context) error {
+	return c.Redirect(http.StatusFound, "/account")
+}
+//
+func Account_info(c echo.Context) error {
+	uid := c.Get("uid")
+	var user model.User
+	err := usersCollection.FindOne(context.TODO(), bson.M{"user_id": uid}).Decode(&user)
+	if err != nil {
+		return err
+	}
+	return c.Render(http.StatusOK, "account", map[string]interface{}{
+		"First_name": user.First_name,
+		"Last_name":  user.Last_name,
+		"Email":      user.Email,
+	})
+}
 
 //Signup form and Handler that render signup template
 func Signup_Form(c echo.Context) error { //Get method

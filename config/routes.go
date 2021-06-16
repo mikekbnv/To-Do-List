@@ -82,4 +82,20 @@ var Routes = []routing.Route{
 			custom_middleware.Authentication(),
 		},
 	},
+	{
+		Method:  "GET",
+		Path:    "/account",
+		Handler: routers.Account_info,
+		Middleware: []echo.MiddlewareFunc{
+			custom_middleware.Authentication(),
+		},
+	},
+	{
+		Method:  "POST",
+		Path:    "/account",
+		Handler: routers.Account_info_page,
+		Middleware: []echo.MiddlewareFunc{
+			custom_middleware.Authentication(),
+		},
+	},
 }
