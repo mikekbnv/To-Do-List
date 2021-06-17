@@ -19,10 +19,12 @@ type User struct {
 	Updated_at    time.Time          `json:"updated_at"`
 	User_id       string             `json:"user_id"`
 }
+
+//Task model
 type Task struct {
-	ID       primitive.ObjectID `bson:"_id,omitempty"`
-	User_Id  string             `json:"user_id"`
-	Name     string             `json:"name"`
-	Modal_Id string             `json:"modal_id"`
-	Status   bool               `json:"status"`
+	ID      primitive.ObjectID `bson:"_id,omitempty"`
+	User_Id string             `json:"user_id"`
+	Name    string             `json:"name"`
+	Status  bool               `json:"status"`
+	Task_id string             `json:"task_id"`
 }

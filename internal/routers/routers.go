@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/labstack/echo"
@@ -44,7 +43,9 @@ func Get_List(c echo.Context) error {
 		"List": list,
 	})
 }
-func get_All_Tasks(user_id interface{}, key string) ([]*model.Task, error) { //Helper for getting tasks
+
+//Helper for getting tasks
+func get_All_Tasks(user_id interface{}, key string) ([]*model.Task, error) {
 	var tasks []*model.Task
 
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
@@ -77,8 +78,6 @@ func get_All_Tasks(user_id interface{}, key string) ([]*model.Task, error) { //H
 	}
 	return tasks, nil
 }
-
-//Ending for getting tasks
 
 //getting tasks for the whole period
 func All_tasks(c echo.Context) error {
@@ -134,22 +133,25 @@ func Createtask(c echo.Context) error {
 	return c.Redirect(http.StatusFound, "/list")
 }
 
-func add_To_Db(task, id string) { //Helper func for adding to Database
+//Helper func for adding to Database
+func add_To_Db(task, id string) {
 	Id := primitive.NewObjectID()
-	start := strings.Index(Id.String(), "\"")
-	str_id := Id.String()[start+1 : len(Id.String())-2]
-	_, err := tasksCollection.InsertOne(context.Background(), model.Task{ID: Id, Name: task, User_Id: id, Modal_Id: str_id})
+	task_id := Id.Hex()
+	_, err := tasksCollection.InsertOne(context.Background(), model.Task{
+		ID:      Id,
+		Name:    task,
+		User_Id: id,
+		Task_id: task_id,
+	})
 	if err != nil {
 		log.Fatal("InsertOne() ERROR:", err)
 	}
 }
 
-//Ending for adding task
-
 //Deleting task from Database
 func Deletetask(c echo.Context) error {
 
-	ID := getid(c.Request().FormValue("task_id"))
+	ID := c.Request().FormValue("task_id")
 	//log.Println("TASK ID:", ID)
 	err := update_task_by_id(ID, "status", true)
 	if err != nil {
@@ -160,7 +162,7 @@ func Deletetask(c echo.Context) error {
 
 //Edit task
 func Edit_task(c echo.Context) error {
-	ID := getid(c.Request().FormValue("task_id"))
+	ID := c.Request().FormValue("task_id")
 	task := c.Request().PostFormValue("task")
 	err := update_task_by_id(ID, "name", task)
 	if err != nil {
@@ -169,12 +171,12 @@ func Edit_task(c echo.Context) error {
 	return c.Redirect(http.StatusFound, "/list")
 }
 
-//
+//Rediraction to account settings page
 func Account_info_page(c echo.Context) error {
 	return c.Redirect(http.StatusFound, "/account")
 }
 
-//
+//Account information page
 func Account_info(c echo.Context) error {
 	var user model.User
 	user, err := get_user_by_id(c.Get("uid"))
@@ -224,6 +226,8 @@ func Signup_Form(c echo.Context) error { //Get method
 	c = clearcookie(c)
 	return c.Render(http.StatusOK, "signup", map[string]interface{}{})
 }
+
+//Registration method
 func Signup(c echo.Context) error { //Post method
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	var user model.User
@@ -300,14 +304,14 @@ func Signup(c echo.Context) error { //Post method
 	return c.Redirect(http.StatusFound, "/login")
 }
 
-//Ending for signup
-
 //Login form and Handler that render login template
 func Login_Form(c echo.Context) error { //Get methon for login
 	c = clearcookie(c)
 	return c.Render(http.StatusOK, "login", map[string]interface{}{})
 }
-func Login(c echo.Context) error { //Post method for login
+
+//Post method for login
+func Login(c echo.Context) error {
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 	defer cancel()
 	var foundUser model.User
@@ -355,13 +359,13 @@ func Login(c echo.Context) error { //Post method for login
 	return c.Redirect(http.StatusFound, "/list")
 }
 
-//Ending for login
-
 //Logout handler for exit
 func Logout(c echo.Context) error { //Post for logout
 	c = clearcookie(c)
 	return c.Redirect(http.StatusFound, "/login")
 }
+
+//Bcrypting pass for storing in DB
 func HashPassword(password string) string {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
@@ -371,6 +375,7 @@ func HashPassword(password string) string {
 	return string(bytes)
 }
 
+//Compare entered password and password provided by user. Helper for login handler
 func VerifyPassword(userPassword string, providedPassword string) bool {
 	fmt.Println()
 	err := bcrypt.CompareHashAndPassword([]byte(providedPassword), []byte(userPassword))
@@ -382,7 +387,9 @@ func VerifyPassword(userPassword string, providedPassword string) bool {
 
 	return check
 }
-func clearcookie(c echo.Context) echo.Context { //Method for clearing user cookie after logout
+
+//Method for clearing user cookie after logout
+func clearcookie(c echo.Context) echo.Context {
 	c.SetCookie(&http.Cookie{
 		Name:  "token",
 		Value: "",
@@ -390,16 +397,8 @@ func clearcookie(c echo.Context) echo.Context { //Method for clearing user cooki
 	return c
 }
 
-func getid(object string) primitive.ObjectID { //Method for parcing mongoDB primitive.ObjectI to string ID
-	start := strings.Index(object, "\"")
-	id := object[start+1 : len(object)-2]
-	idPrimitive, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		log.Fatal("primitive.ObjectIDFromHex ERROR:", err)
-	}
-	return idPrimitive
-}
-func update_task_by_id(id primitive.ObjectID, field string, value interface{}) error { //Update Task in DB by the provided field and value
+//Update Task in DB by the provided field and value
+func update_task_by_id(id string, field string, value interface{}) error {
 	update := bson.M{}
 	if field == "name" {
 		update = bson.M{
@@ -417,7 +416,7 @@ func update_task_by_id(id primitive.ObjectID, field string, value interface{}) e
 	//log.Println("ID ", id, "\nTask ", value)
 	_, err := tasksCollection.UpdateOne(
 		context.Background(),
-		bson.M{"_id": id},
+		bson.M{"task_id": id},
 		update,
 		&opt,
 	)
@@ -427,6 +426,7 @@ func update_task_by_id(id primitive.ObjectID, field string, value interface{}) e
 	return err
 }
 
+//Function for updating any user field by provided uid
 func update_user_field_by_uid(uid interface{}, field, value string) error {
 	upsert := true
 	opt := options.UpdateOptions{
@@ -447,7 +447,7 @@ func update_user_field_by_uid(uid interface{}, field, value string) error {
 	return nil
 }
 
-// get user info by user id
+//Get user info by user id
 func get_user_by_id(uid interface{}) (model.User, error) {
 	var user model.User
 	err := usersCollection.FindOne(context.Background(), bson.M{"user_id": uid}).Decode(&user)
@@ -457,7 +457,7 @@ func get_user_by_id(uid interface{}) (model.User, error) {
 	return user, nil
 }
 
-//Method for helping to collect error from login or signup handlerss
+//Method for helping to collect error from login or signup handlers
 func errors(msg map[string]string, field, msg_error string) map[string]string {
 	msg[field] = msg_error
 	return msg

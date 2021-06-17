@@ -57,13 +57,13 @@ html lang=en
               div.col-sm-2
                 
                 form action="/delete" method="POST"
-                  input type="hidden" value="{{ .ID }}" name="task_id"
+                  input type="hidden" value="{{ .Task_id }}" name="task_id"
                   input.col-sm-5.btn-sm.btn.btn-success type="submit" value="✓"
                   input.col-sm-5.ofset-1.ml-4.btn-sm.btn.btn-danger type="submit" value="✕"
               div.col-sm-1
-                button.col-sm-12.btn.btn-warning.btn-sm type="button" data-toggle="modal" data-target="#M{{ .Modal_Id }}"
+                button.col-sm-12.btn.btn-warning.btn-sm type="button" data-toggle="modal" data-target="#M{{ .Task_id }}"
                   Open edit
-                div.modal.fade id="M{{ .Modal_Id }}" tabindex="-1" role="dialog"
+                div.modal.fade id="M{{ .Task_id }}" tabindex="-1" role="dialog"
                   div.modal-dialog.modal-dialog-centered role="document"
                     div.modal-content
                       div.modal-header
@@ -72,7 +72,7 @@ html lang=en
                           span aria-hidden="true" ×
                       div.modal-body
                         form role="form" action="/edit" method="POST"
-                          input type="hidden" value="{{ .ID }}" name="task_id"
+                          input type="hidden" value="{{ .Task_id }}" name="task_id"
                           input.col.form-control type="text" name="task" value="{{ .Name }}" placeholder="{{ .Name }}"
                           div.mt-2 style="display: flex; justify-content: flex-end"
                             input.btn.btn-success type="submit" value="Save"          
