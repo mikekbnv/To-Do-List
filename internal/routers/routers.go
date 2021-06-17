@@ -97,8 +97,10 @@ func All_tasks(c echo.Context) error {
 
 //Undo task if it was deleted
 func Undo_task(c echo.Context) error {
-	ID := getid(c.Request().FormValue("id"))
-	//log.Println("TASK ID:", ID)
+	ID, err := get_user_by_id(c.Get("uid"))
+	if err != nil {
+		log.Fatal("Error with getting user by id")
+	}
 
 	upsert := true
 	opt := options.UpdateOptions{
@@ -107,9 +109,9 @@ func Undo_task(c echo.Context) error {
 	update := bson.M{
 		"$set": bson.M{"status": false},
 	}
-	_, err := tasksCollection.UpdateOne(
+	_, err = tasksCollection.UpdateOne(
 		context.Background(),
-		bson.M{"_id": ID},
+		bson.M{"user_id": ID},
 		update,
 		&opt,
 	)
@@ -149,7 +151,7 @@ func Deletetask(c echo.Context) error {
 
 	ID := getid(c.Request().FormValue("task_id"))
 	//log.Println("TASK ID:", ID)
-	err := update_by_id(ID, "status", true)
+	err := update_task_by_id(ID, "status", true)
 	if err != nil {
 		log.Fatal("Update status() ERROR:", err)
 	}
@@ -160,29 +162,61 @@ func Deletetask(c echo.Context) error {
 func Edit_task(c echo.Context) error {
 	ID := getid(c.Request().FormValue("task_id"))
 	task := c.Request().PostFormValue("task")
-	err := update_by_id(ID, "name", task)
+	err := update_task_by_id(ID, "name", task)
 	if err != nil {
 		log.Fatal("Edit task() ERROR:", err)
 	}
 	return c.Redirect(http.StatusFound, "/list")
 }
+
 //
 func Account_info_page(c echo.Context) error {
 	return c.Redirect(http.StatusFound, "/account")
 }
+
 //
 func Account_info(c echo.Context) error {
-	uid := c.Get("uid")
 	var user model.User
-	err := usersCollection.FindOne(context.TODO(), bson.M{"user_id": uid}).Decode(&user)
+	user, err := get_user_by_id(c.Get("uid"))
 	if err != nil {
-		return err
+		log.Fatal("Error with getting user by id")
 	}
 	return c.Render(http.StatusOK, "account", map[string]interface{}{
 		"First_name": user.First_name,
 		"Last_name":  user.Last_name,
 		"Email":      user.Email,
 	})
+}
+
+//Updating user info if needed
+func Account_update(c echo.Context) error {
+	var found_user, form_user model.User
+	uid := c.Get("uid")
+	found_user, err := get_user_by_id(uid)
+	if err != nil {
+		log.Fatal("Error with getting user by id")
+	}
+	_ = c.Bind(&form_user)
+	if found_user.First_name != form_user.First_name {
+		err := update_user_field_by_uid(uid, "first_name", *form_user.First_name)
+		if err != nil {
+			return err
+		}
+	}
+	if found_user.Last_name != form_user.Last_name {
+		err := update_user_field_by_uid(uid, "last_name", *form_user.Last_name)
+		if err != nil {
+			return err
+		}
+	}
+	if found_user.Email != form_user.Email {
+		err := update_user_field_by_uid(uid, "email", *form_user.Email)
+		if err != nil {
+			return err
+		}
+	}
+
+	return c.Redirect(http.StatusFound, "/list")
 }
 
 //Signup form and Handler that render signup template
@@ -365,7 +399,7 @@ func getid(object string) primitive.ObjectID { //Method for parcing mongoDB prim
 	}
 	return idPrimitive
 }
-func update_by_id(id primitive.ObjectID, field string, value interface{}) error { //Update Task in DB by the provided field and value
+func update_task_by_id(id primitive.ObjectID, field string, value interface{}) error { //Update Task in DB by the provided field and value
 	update := bson.M{}
 	if field == "name" {
 		update = bson.M{
@@ -393,7 +427,38 @@ func update_by_id(id primitive.ObjectID, field string, value interface{}) error 
 	return err
 }
 
-func errors(msg map[string]string, field, msg_error string) map[string]string { //Method for helping to collect error from login or signup handlerss
+func update_user_field_by_uid(uid interface{}, field, value string) error {
+	upsert := true
+	opt := options.UpdateOptions{
+		Upsert: &upsert,
+	}
+	update := bson.M{
+		"$set": bson.M{field: value},
+	}
+	_, err := usersCollection.UpdateOne(
+		context.Background(),
+		bson.M{"user_id": uid},
+		update,
+		&opt,
+	)
+	if err != nil {
+		log.Fatal("Error with updating user info:", err)
+	}
+	return nil
+}
+
+// get user info by user id
+func get_user_by_id(uid interface{}) (model.User, error) {
+	var user model.User
+	err := usersCollection.FindOne(context.Background(), bson.M{"user_id": uid}).Decode(&user)
+	if err != nil {
+		return user, err
+	}
+	return user, nil
+}
+
+//Method for helping to collect error from login or signup handlerss
+func errors(msg map[string]string, field, msg_error string) map[string]string {
 	msg[field] = msg_error
 	return msg
 }

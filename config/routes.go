@@ -98,4 +98,12 @@ var Routes = []routing.Route{
 			custom_middleware.Authentication(),
 		},
 	},
+	{
+		Method:  "POST",
+		Path:    "/account/update",
+		Handler: routers.Account_update,
+		Middleware: []echo.MiddlewareFunc{
+			custom_middleware.Authentication(),
+		},
+	},
 }
