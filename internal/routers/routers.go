@@ -33,8 +33,7 @@ var tasksCollection *mongo.Collection = database.OpenCollection("tasks")
 func Get_List(c echo.Context) error {
 	clientname := c.Get("first_name")
 	id := c.Get("uid")
-	id_str := fmt.Sprint(id)
-	list, err := get_All_Tasks(id_str, "valid")
+	list, err := get_All_Tasks(id, "valid")
 	if err != nil {
 		log.Println("error with getting tasks")
 	}
@@ -83,8 +82,7 @@ func get_All_Tasks(user_id interface{}, key string) ([]*model.Task, error) {
 func All_tasks(c echo.Context) error {
 	clientname := c.Get("first_name")
 	id := c.Get("uid")
-	id_str := fmt.Sprint(id)
-	list, err := get_All_Tasks(id_str, "all")
+	list, err := get_All_Tasks(id, "all")
 	if err != nil {
 		log.Println("error with getting tasks")
 	}
@@ -96,24 +94,8 @@ func All_tasks(c echo.Context) error {
 
 //Undo task if it was deleted
 func Undo_task(c echo.Context) error {
-	ID, err := get_user_by_id(c.Get("uid"))
-	if err != nil {
-		log.Fatal("Error with getting user by id")
-	}
-
-	upsert := true
-	opt := options.UpdateOptions{
-		Upsert: &upsert,
-	}
-	update := bson.M{
-		"$set": bson.M{"status": false},
-	}
-	_, err = tasksCollection.UpdateOne(
-		context.Background(),
-		bson.M{"user_id": ID},
-		update,
-		&opt,
-	)
+	Id := c.Request().PostFormValue("task_id")
+	err := update_task_by_id(Id, "status", false)
 	if err != nil {
 		log.Fatal("Undo error:", err)
 	}
@@ -124,23 +106,22 @@ func Undo_task(c echo.Context) error {
 //Adding and creating task to Database
 func Createtask(c echo.Context) error {
 	id := c.Get("uid")
-	id_str := fmt.Sprint(id)
 	task := c.Request().PostFormValue("task")
 	if task != "" {
-		add_To_Db(task, id_str)
+		add_To_Db(task, id)
 
 	}
 	return c.Redirect(http.StatusFound, "/list")
 }
 
 //Helper func for adding to Database
-func add_To_Db(task, id string) {
+func add_To_Db(task string, user_id interface{}) {
 	Id := primitive.NewObjectID()
 	task_id := Id.Hex()
 	_, err := tasksCollection.InsertOne(context.Background(), model.Task{
 		ID:      Id,
 		Name:    task,
-		User_Id: id,
+		User_Id: user_id.(string),
 		Task_id: task_id,
 	})
 	if err != nil {

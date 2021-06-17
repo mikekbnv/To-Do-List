@@ -33,12 +33,9 @@ html lang=en
               label for="lastname" Last Name 
                 input.bg-light.form-control type="text" value="{{ .Last_name }}" name="last_name" placeholder="{{ .Last_name }}" 
           div.row.py-2
-            div.col-md-6
-              label for="email" Email Address 
-                input.bg-light.form-control type="text" value="{{ .Email }}" name="email" placeholder="{{ .Email }}"
-            div.col-md-6.pt-md-0.pt-3
-              label for="phone" Phone Number
-                input.bg-light.form-control type="tel" placeholder="+1 213-548-6015"
+            div.col-md-9
+              label for="email" Email Address
+              input.bg-light.form-control type="text" value="{{ .Email }}" name="email" placeholder="{{ .Email }}"
           div.row.py-3.pb-4.border-bottom 
             div.col-3
               input.col.btn.btn-primary type="submit" value="Change"

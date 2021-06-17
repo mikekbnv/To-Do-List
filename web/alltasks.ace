@@ -26,7 +26,7 @@ html lang=en
                 {{ .Name }}
               div.col-sm-2
                 form action="/undo" method="POST"
-                  input type="hidden" value="{{ .ID }}" name="id"
+                  input type="hidden" value="{{ .Task_id }}" name="task_id"
                   input.col-sm-6.offset-6.btn.btn-warning type="submit" value="Undo"
           {{ end }} 
         {{ end }}
