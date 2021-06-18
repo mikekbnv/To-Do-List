@@ -23,9 +23,12 @@ type Message struct {
 	Errors       map[string]string
 }
 
-const Token_Cookie_Name = "token"
-const Refresh_Token_Cookie_Name = "refresh_token"
+const (
+	Token_Cookie_Name         = "token"
+	Refresh_Token_Cookie_Name = "refresh_token"
+)
 
+var layoutUS = "January 2, 2006"
 var usersCollection *mongo.Collection = database.OpenCollection("users")
 var tasksCollection *mongo.Collection = database.OpenCollection("tasks")
 
@@ -119,10 +122,11 @@ func add_To_Db(task string, user_id interface{}) {
 	Id := primitive.NewObjectID()
 	task_id := Id.Hex()
 	_, err := tasksCollection.InsertOne(context.Background(), model.Task{
-		ID:      Id,
-		Name:    task,
-		User_Id: user_id.(string),
-		Task_id: task_id,
+		ID:         Id,
+		User_Id:    user_id.(string),
+		Name:       task,
+		Created_at: time.Now().Format(layoutUS),
+		Task_id:    task_id,
 	})
 	if err != nil {
 		log.Fatal("InsertOne() ERROR:", err)

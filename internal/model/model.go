@@ -22,9 +22,10 @@ type User struct {
 
 //Task model
 type Task struct {
-	ID      primitive.ObjectID `bson:"_id,omitempty"`
-	User_Id string             `json:"user_id"`
-	Name    string             `json:"name"`
-	Status  bool               `json:"status"`
-	Task_id string             `json:"task_id"`
+	ID         primitive.ObjectID `bson:"_id,omitempty"`
+	User_Id    string             `json:"user_id"`
+	Name       string             `json:"name"`
+	Status     bool               `json:"status"`
+	Created_at string             `json:"created_at"`
+	Task_id    string             `json:"task_id"`
 }
