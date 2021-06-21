@@ -22,7 +22,7 @@ html lang=en
                 p {{ . }}
                 {{ end }}
                 div.form-group
-                  input.form-control.input-sm type="email" name="email" placeholder="Email Address"
+                  input.form-control.input-sm type="email" name="Email" value="{{.Inputed_info.email_val}}" placeholder="Email Address"
                 {{with .Errors.Password }}
                 p {{ . }}
                 {{ end }}

@@ -301,11 +301,14 @@ func Login(c echo.Context) error {
 	defer cancel()
 	var foundUser model.User
 	var msg Message
+	msg.Errors = make(map[string]string)
+	msg.Inputed_info = make(map[string]string)
 
-	email := c.Request().FormValue("email")
+	email := c.Request().FormValue("Email")
 	pass := c.Request().FormValue("Password")
 
-	msg.Errors = make(map[string]string)
+	err := usersCollection.FindOne(ctx, bson.M{"email": email}).Decode(&foundUser)
+
 	if email == "" {
 		msg.Errors["Email"] = "Please enter an email address"
 		if pass == "" {
@@ -314,14 +317,15 @@ func Login(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "login", msg)
 	} else if pass == "" {
+		if err != nil {
+			msg.Errors["Error"] = "User with this email does not exist"
+			return c.Render(http.StatusBadRequest, "login", msg)
+		}
 		msg.Errors["Password"] = "Please enter a password"
+		msg.Inputed_info["email_val"] = email
 		return c.Render(http.StatusBadRequest, "login", msg)
 	}
 
-	err := usersCollection.FindOne(ctx, bson.M{"email": email}).Decode(&foundUser)
-	if err != nil {
-		return c.Redirect(http.StatusFound, "/login")
-	}
 	passwordIsValid := VerifyPassword(pass, *foundUser.Password)
 	if !passwordIsValid {
 		msg.Errors["Error"] = "Email or password is incorrect"
