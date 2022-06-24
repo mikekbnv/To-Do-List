@@ -297,8 +297,8 @@ func Login_Form(c echo.Context) error { //Get methon for login
 
 //Post method for login
 func Login(c echo.Context) error {
-	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
-	defer cancel()
+	var ctx, _ = context.WithTimeout(context.Background(), 100*time.Second)
+
 	var foundUser model.User
 	var msg Message
 	msg.Errors = make(map[string]string)
@@ -306,9 +306,13 @@ func Login(c echo.Context) error {
 
 	email := c.Request().FormValue("Email")
 	pass := c.Request().FormValue("Password")
-
+	
 	err := usersCollection.FindOne(ctx, bson.M{"email": email}).Decode(&foundUser)
-
+	if err != nil  || foundUser == (model.User{}){
+		msg.Errors["Error"] = "User with this email does not exist"
+		return c.Render(http.StatusBadRequest, "login", msg)
+	}
+	
 	if email == "" {
 		msg.Errors["Email"] = "Please enter an email address"
 		if pass == "" {
@@ -317,10 +321,6 @@ func Login(c echo.Context) error {
 		}
 		return c.Render(http.StatusBadRequest, "login", msg)
 	} else if pass == "" {
-		if err != nil {
-			msg.Errors["Error"] = "User with this email does not exist"
-			return c.Render(http.StatusBadRequest, "login", msg)
-		}
 		msg.Errors["Password"] = "Please enter a password"
 		msg.Inputed_info["email_val"] = email
 		return c.Render(http.StatusBadRequest, "login", msg)
@@ -342,7 +342,7 @@ func Login(c echo.Context) error {
 		Name:  Refresh_Token_Cookie_Name,
 		Value: refreshToken,
 	}
-
+	fmt.Println(email, pass)
 	c.SetCookie(cookiestoken)
 	c.SetCookie(cookiesrefresh)
 	return c.Redirect(http.StatusFound, "/list")

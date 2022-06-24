@@ -19,15 +19,11 @@ func DBinstance() *mongo.Client {
 		log.Fatal("Error loading .env file")
 	}
 	MongoDb := os.Getenv("MONGODB_URL")
-	client, err := mongo.NewClient(options.Client().ApplyURI(MongoDb))
-	if err != nil {
-		log.Fatal(err)
-	}
-
+	serverAPIOptions := options.ServerAPI(options.ServerAPIVersion1)
+	clientOptions := options.Client().ApplyURI(MongoDb).SetServerAPIOptions(serverAPIOptions)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-
 	defer cancel()
-	err = client.Connect(ctx)
+	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		log.Fatal(err)
 	}
